@@ -7,7 +7,7 @@ var height = 400;
 var xOffset;
 var yOffset;
 
-var deltaT = 0.05;
+var deltaT = 0.01;
 var t = 0.0;
 
 var surface;

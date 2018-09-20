@@ -250,7 +250,7 @@ int main(int argc, char** argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(800, 600);
-    glutCreateWindow("CSCI 3090u Shading in OpenGL");
+    glutCreateWindow("CSCI 4110U - Sphere Geometry");
     glutIdleFunc(&update);
     glutDisplayFunc(&render);
     glutReshapeFunc(&reshape);
