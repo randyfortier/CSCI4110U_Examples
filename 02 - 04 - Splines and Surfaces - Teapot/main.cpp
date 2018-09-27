@@ -128,7 +128,15 @@ void displayFunc(void) {
 	matrixLoc = glGetUniformLocation(programId, "u_MVP");
 	glUniformMatrix4fv(matrixLoc, 1, 0, glm::value_ptr(modelViewPerspective));
 
-	// TODO: Draw code for patches
+	glPatchParameteri(GL_PATCH_VERTICES, 16);
+
+	float inner[] = { TessInner, TessOuter };
+	float outer[] = { TessOuter, TessOuter, TessOuter, TessOuter };
+
+	glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &inner[0]);
+	glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &outer[0]);
+
+	// TODO:  Draw the patch, pass in the control points
 
 	glutSwapBuffers();
 }
