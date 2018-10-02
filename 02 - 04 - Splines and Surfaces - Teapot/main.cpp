@@ -136,7 +136,9 @@ void displayFunc(void) {
 	glPatchParameterfv(GL_PATCH_DEFAULT_INNER_LEVEL, &inner[0]);
 	glPatchParameterfv(GL_PATCH_DEFAULT_OUTER_LEVEL, &outer[0]);
 
-	// TODO:  Draw the patch, pass in the control points
+	// Draw the patch, pass in the control points
+	glBindVertexArray(SurfaceKnotsVao);
+	glDrawElements(GL_PATCHES, KnotCount, GL_UNSIGNED_SHORT, 0);
 
 	glutSwapBuffers();
 }
