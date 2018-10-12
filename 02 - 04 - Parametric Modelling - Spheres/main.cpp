@@ -54,21 +54,21 @@ static void createGeometry(void) {
   mesh.load("my_sphere.obj", true, true);
 
   numVertices = mesh.getNumIndexedVertices();
-  Vector3* vertexPositions = mesh.getIndexedPositions();
-  Vector2* vertexTextureCoords = mesh.getIndexedTextureCoords();
-  Vector3* vertexNormals = mesh.getIndexedNormals();
+  glm::vec3* vertexPositions = mesh.getIndexedPositions();
+  glm::vec2* vertexTextureCoords = mesh.getIndexedTextureCoords();
+  glm::vec3* vertexNormals = mesh.getIndexedNormals();
 
   glGenBuffers(1, &positions_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, positions_vbo);
-  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(Vector3), vertexPositions, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3), vertexPositions, GL_STATIC_DRAW);
 
   glGenBuffers(1, &textureCoords_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, textureCoords_vbo);
-  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(Vector2), vertexTextureCoords, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3), vertexTextureCoords, GL_STATIC_DRAW);
 
   glGenBuffers(1, &normals_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, normals_vbo);
-  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(Vector3), vertexNormals, GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, numVertices * sizeof(glm::vec3), vertexNormals, GL_STATIC_DRAW);
 
   unsigned int* indexData = mesh.getTriangleIndices();
   int numTriangles = mesh.getNumTriangles();

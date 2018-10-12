@@ -8,11 +8,6 @@
 
 #include "ObjMesh.h"
 
-struct Triangle {
-	int a, b, c;
-};
-typedef struct Triangle Triangle;
-
 static inline void ltrim(std::string &s) {
 	s.erase(s.begin(), find_if(s.begin(), s.end(), [](int ch) {
 		return !isspace(ch);
@@ -44,9 +39,9 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 		return;
 	}
 
-	std::vector<Vector3> vertexPositions;
-	std::vector<Vector2> vertexTextureCoords;
-	std::vector<Vector3> vertexNormals;
+	std::vector<glm::vec3> vertexPositions;
+	std::vector<glm::vec2> vertexTextureCoords;
+	std::vector<glm::vec3> vertexNormals;
 	std::vector<unsigned int> positionIndices;
 	std::vector<unsigned int> textureCoordIndices;
 	std::vector<unsigned int> normalIndices;
@@ -80,7 +75,7 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 				float x, y, z;
 				lineIn >> x >> y >> z;
 
-				Vector3 v;
+				glm::vec3 v;
 				v.x = x;
 				v.y = y;
 				v.z = z;
@@ -116,9 +111,9 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 				float u, v;
 				lineIn >> u >> v;
 
-				Vector2 t;
-				t.u = u;
-				t.v = v;
+				glm::vec2 t;
+				t.x = u;
+				t.y = v;
 
 				vertexTextureCoords.push_back(t);
 			} else if (typeIdentifier == "vn") {
@@ -126,7 +121,7 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 				float x, y, z;
 				lineIn >> x >> y >> z;
 
-				Vector3 n;
+				glm::vec3 n;
 				n.x = x;
 				n.y = y;
 				n.z = z;
@@ -199,9 +194,9 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 	}
 
 	// collect the vertex positions, texture coordinates, and normals for each face
-	std::vector<Vector3> indexedPositions;
-	std::vector<Vector2> indexedTextureCoords;
-	std::vector<Vector3> indexedNormals;
+	std::vector<glm::vec3> indexedPositions;
+	std::vector<glm::vec2> indexedTextureCoords;
+	std::vector<glm::vec3> indexedNormals;
 	std::vector<unsigned int> vertexIndices;
 
 	for (unsigned int i = 0; i < this->numIndexedVertices; i++) {
@@ -222,11 +217,11 @@ void ObjMesh::load(const std::string filename, const bool autoCentre = false, co
 	this->triangleIndices = vertexIndices;
 }
 
-Vector3 ObjMesh::getCentre() {
+glm::vec3 ObjMesh::getCentre() {
 	return this->centre;
 }
 
-Vector3 ObjMesh::getDimensions() {
+glm::vec3 ObjMesh::getDimensions() {
 	return this->dimensions;
 }
 
@@ -234,15 +229,15 @@ unsigned int ObjMesh::getNumVertices() {
 	return this->numVertices;
 }
 
-Vector3* ObjMesh::getIndexedPositions() {
+glm::vec3* ObjMesh::getIndexedPositions() {
 	return this->indexedPositions.data();
 }
 
-Vector2* ObjMesh::getIndexedTextureCoords() {
+glm::vec2* ObjMesh::getIndexedTextureCoords() {
 	return this->indexedTextureCoords.data();
 }
 
-Vector3* ObjMesh::getIndexedNormals() {
+glm::vec3* ObjMesh::getIndexedNormals() {
 	return this->indexedNormals.data();
 }
 
