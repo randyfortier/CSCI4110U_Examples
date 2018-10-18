@@ -24,6 +24,10 @@ glm::mat4 view;
 
 
 // TODO:  Add key frame variables
+const unsigned int NUM_KEY_FRAMES = 6;
+float xOffsets[NUM_KEY_FRAMES + 1] = {-10.0f,  0.0f, 10.0f,   7.0f,   0.0f,  -7.0f, -10.0f};
+float yOffsets[NUM_KEY_FRAMES + 1] = {  0.0f, 10.0f,  0.0f, -10.0f, -10.0f, -10.0f,   0.0f};
+
 
 static GLuint createShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
 static GLuint createShader(const GLenum shaderType, const std::string shaderSource);
