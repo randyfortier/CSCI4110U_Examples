@@ -22,11 +22,25 @@ GLenum positionBufferId;
 glm::mat4 projection;
 glm::mat4 view;
 
-
-// TODO:  Add key frame variables
 const unsigned int NUM_KEY_FRAMES = 6;
 float xOffsets[NUM_KEY_FRAMES + 1] = {-10.0f,  0.0f, 10.0f,   7.0f,   0.0f,  -7.0f, -10.0f};
 float yOffsets[NUM_KEY_FRAMES + 1] = {  0.0f, 10.0f,  0.0f, -10.0f, -10.0f, -10.0f,   0.0f};
+
+float xAngles[NUM_KEY_FRAMES + 1] = { 0.0f,   0.0f,    0.0f,    0.0f,  180.0f,  360.0f,  360.0f};
+float zAngles[NUM_KEY_FRAMES + 1] = { 0.0f, -90.0f, -180.0f, -270.0f, -270.0f, -270.0f, -360.0f};
+
+int keyFrameTimes[NUM_KEY_FRAMES + 2] = {  0, 1000, 2000, 3000, 4000, 5000, 6000, 7000};
+
+int startTime = 0;
+int endTime = keyFrameTimes[NUM_KEY_FRAMES];
+
+float xOffset;
+float yOffset;
+
+float xAngle = 0.0f;
+float zAngle = 0.0f;
+
+int keyFrame = 0;
 
 
 static GLuint createShaderProgram(const std::string& vertexShaderSource, const std::string& fragmentShaderSource);
@@ -52,10 +66,6 @@ static void createGeometry(void) {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indexData), indexData, GL_STATIC_DRAW);
 }
 
-// TODO: Add a linear interpolation function
-
-bool keepAnimating;
-
 static int nextFrame() {
   if (keyFrame >= NUM_KEY_FRAMES) {
     return 0;
@@ -63,11 +73,47 @@ static int nextFrame() {
   return keyFrame + 1;
 }
 
-static void update(void) {
+bool keepAnimating = true;
 
-    // TODO:  Update the various key frame variables using linear interpolation
+static float lerp(float startValue, float endValue, float t) {
+  return startValue * (1.0f - t) + endValue * t;
+}
+
+static void update(void) {
+  if (keepAnimating) {
+
+    // Update the various key frame variables using linear interpolation
+    int ticks = glutGet(GLUT_ELAPSED_TIME);
+
+    int elapsedTime = ticks - startTime; // since the start of the program
+
+    int nextKeyFrame = nextFrame();
+
+    // see if we're moving to the next frame
+    if (elapsedTime > keyFrameTimes[nextKeyFrame]) {
+      if (nextKeyFrame == 0) {
+        keepAnimating = false;
+      }
+
+      keyFrame = nextKeyFrame;
+      nextKeyFrame = nextFrame();
+    }
+
+    // calculate the t parameter
+    int keyFrameDuration = keyFrameTimes[nextKeyFrame] - keyFrameTimes[keyFrame];
+    int timeIntoFrame = elapsedTime - keyFrameTimes[keyFrame];
+    float t = (float)timeIntoFrame / (float)keyFrameDuration;
+
+    // calculate the interpolated translations
+    xOffset = lerp(xOffsets[keyFrame], xOffsets[nextKeyFrame], t);
+    yOffset = lerp(yOffsets[keyFrame], yOffsets[nextKeyFrame], t);
+
+    //interpolate the angles
+    xAngle = lerp(xAngles[keyFrame], xAngles[nextKeyFrame], t);
+    zAngle = lerp(zAngles[keyFrame], zAngles[nextKeyFrame], t);
 
     glutPostRedisplay();
+  }
 }
 
 static void render(void) {
