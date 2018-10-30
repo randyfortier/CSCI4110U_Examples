@@ -60,7 +60,7 @@ float deltaT = 0.01f;
 
 static void createGeometry(void) {
   // sphere geometry
-  mesh.load("sphere.obj", true, true);
+  mesh.load("meshes/sphere.obj", true, true);
 
   numVertices = mesh.getNumIndexedVertices();
   Vector3* vertexPositions = mesh.getIndexedPositions();
@@ -123,7 +123,17 @@ static void render(void) {
   glm::vec4 white(1.0, 1.0, 1.0, 1.0);
   glm::vec4 red(1.0, 0.0, 0.0, 1.0);
 
-  // TODO: Draw the weight and the spring
+  // Draw the spring
+  float pendulumDisplacement = 5.0f + pendulumSpring.getDisplacement();
+
+  glm::mat4 modelMatrix = glm::mat4(1.0f);
+  modelMatrix = glm::scale(modelMatrix, glm::vec3(1.0f, pendulumDisplacement, 1.0f));
+  drawLine(modelMatrix, white);
+
+  // Draw the weight
+  modelMatrix = glm::mat4(1.0f);
+  modelMatrix = glm::translate(modelMatrix, glm::vec3(0.0f, -pendulumDisplacement, 0.0f));
+  drawSphere(modelMatrix, red);
 
   // make the draw buffer to display buffer (i.e. display what we have drawn)
   glutSwapBuffers();
