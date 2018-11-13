@@ -14,7 +14,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
-// TODO:  include the STB image library
+// include the STB image library
+#define STB_IMAGE_IMPLEMENTATION
+#include "apis/stb_image.h"
 
 #include "ShaderProgram.h"
 #include "ObjMesh.h"
@@ -35,7 +37,35 @@ unsigned int numVertices;
 unsigned int loadTexture(char const * path);
 
 static void createTexture(std::string filename) {
-   // TODO: Implement me
+   int imageWidth, imageHeight;
+   int numComponents;
+
+   unsigned char* bitmap = stbi_load(filename.c_str(),
+                                     &imageWidth,
+                                     &imageHeight,
+                                     &numComponents, 4);
+
+   GLuint textureId;
+   glGenTextures(1, &textureId);
+
+   glBindTexture(GL_TEXTURE_2D, textureId);
+
+   // resizing settings
+   glGenerateTextureMipmap(textureId);
+   glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP, GL_TRUE);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+
+   // provide the image data to OpenGL
+   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8,
+                imageWidth, imageHeight,
+                0, GL_RGBA, GL_UNSIGNED_BYTE, bitmap);
+
+   glBindTexture(GL_TEXTURE_2D, 0);
+   glActiveTexture(GL_TEXTURE0);
+
+   // free up the bitmap
+   stbi_image_free(bitmap);
 }
 
 static void createGeometry(void) {
@@ -115,24 +145,22 @@ static void render(void) {
   // model matrix: translate, scale, and rotate the model
   glm::vec3 rotationAxis(0,1,0);
   glm::mat4 model = glm::mat4(1.0f);
-  //model = glm::translate(model, glm::vec3(-6.0f, -2.0f, 1.0));
   model = glm::rotate(model, glm::radians(angle), glm::vec3(0, 1, 0)); // rotate about the y-axis
   model = glm::scale(model, glm::vec3(25.0f, 25.0f, 25.0f));
 
   // model-view-projection matrix
   glm::mat4 mvp = projection * view * model;
-  GLuint mvpMatrixId = glGetUniformLocation(programId, "MVP");
+  GLuint mvpMatrixId = glGetUniformLocation(programId, "u_MVP");
   glUniformMatrix4fv(mvpMatrixId, 1, GL_FALSE, &mvp[0][0]);
 
   // texture sampler - a reference to the texture we've previously created
-  GLuint textureId  = glGetUniformLocation(programId, "textureSampler");
+  GLuint textureId  = glGetUniformLocation(programId, "u_TextureSampler");
   glActiveTexture(GL_TEXTURE0);  // texture unit 0
   glBindTexture(GL_TEXTURE_2D, textureId);
   glUniform1i(textureId, 0);
 
   // find the names (ids) of each vertex attribute
   GLint positionAttribId = glGetAttribLocation(programId, "position");
-  GLint colourAttribId = glGetAttribLocation(programId, "colour");
   GLint textureCoordsAttribId = glGetAttribLocation(programId, "textureCoords");
   GLint normalAttribId = glGetAttribLocation(programId, "normal");
 
@@ -162,7 +190,6 @@ static void render(void) {
   glDisableVertexAttribArray(positionAttribId);
   glDisableVertexAttribArray(textureCoordsAttribId);
   glDisableVertexAttribArray(normalAttribId);
-  glDisableVertexAttribArray(colourAttribId);
 
 	// make the draw buffer to display buffer (i.e. display what we have drawn)
 	glutSwapBuffers();
