@@ -3,50 +3,50 @@ uniform vec4 u_DiffuseColour;
 uniform vec3 u_EyePosition;
 uniform float u_Shininess;
 
-varying vec3 v_Position;
 varying vec3 v_Normal;
-varying vec3 v_OriginalPosition;
+varying vec3 v_Position;
+varying vec3 v_Position_Model;
+
+float bump(float heightScale, float widthScale, float coord) {
+   return heightScale * sin(widthScale * coord);
+}
 
 void main() {
-    // procedural bump mapping
-    float bumpHeightScale = 7.5;
-    float bumpWidthScale = 100;
+   vec4 baseColour = u_DiffuseColour;
 
-    float x = v_OriginalPosition.x;
-    float y = v_OriginalPosition.y;
-    float z = v_OriginalPosition.z; // for convenience
+   // procedurally-modify the normals
+   float bumpHeightScale = 15.0;
+   float bumpWidthScale = 150.0;
 
-    vec3 normal = v_Normal;
+   float x = v_Position_Model.x;
+   float y = v_Position_Model.y;
+   float z = v_Position_Model.z;
 
-    normal.x += bumpHeightScale * sin(bumpWidthScale * x);
-    normal.y += bumpHeightScale * sin(bumpWidthScale * y);
-    normal.z += bumpHeightScale * sin(bumpWidthScale * z);
+   vec3 normal = v_Normal;
 
-    normal = normalize(normal); // weirdest line of code ever?
+   normal.x += bump(bumpHeightScale, bumpWidthScale, x);
+   normal.y += bump(bumpHeightScale, bumpWidthScale, y);
+   normal.z += bump(bumpHeightScale, bumpWidthScale, z);
 
-    vec4 ambientColour = vec4(0.1, 0.1, 0.1, 1.0);
+   normal = normalize(normal); // weirdest line of code ever
 
-    // Will be used for attenuation.
-    float distance = length(u_LightPos - v_Position);
+   // lighting and shading
 
-    // Get a lighting direction vector from the light to the vertex.
-    vec3 lightVector = normalize(u_LightPos - v_Position);
+   // ambient
+   vec4 ambientColour = vec4(0.1, 0.1, 0.1, 1.0);
 
-    // Calculate the dot product of the light vector and vertex normal. If the normal and light vector are
-    // pointing in the same direction then it will get max illumination.
-    float diffuse = clamp(dot(normal, lightVector), 0, 1);
+   // diffuse
+   float distance = length(u_LightPos - v_Position);
+   vec3 lightVector = normalize(u_LightPos - v_Position);
+   float diffuse = clamp(dot(normal, lightVector), 0, 1);
+   diffuse = diffuse * (1.0 / (1.0 + (0.00025 * distance * distance)));
 
-    // Add attenuation.
-    diffuse = diffuse * (1.0 / (1.0 + (0.00025 * distance * distance)));
+   // specular
+   vec3 incidence = -lightVector;
+   vec3 reflection = reflect(incidence, normal);
+   vec3 eyeVector = normalize(u_EyePosition - v_Position);
+   float cosAngle = max(0.0, dot(eyeVector, reflection));
+   float specular = pow(cosAngle, u_Shininess);
 
-    vec3 incidenceVector = -lightVector;
-    vec3 reflectionVector = reflect(incidenceVector, normal);
-    vec3 eyeVector = normalize(u_EyePosition - v_Position);
-    float cosAngle = max(0.0, dot(eyeVector, reflectionVector));
-    float specularCoefficient = pow(cosAngle, u_Shininess);
-
-    // should be (diffuse * specular) * attenuationFactor;
-
-    // Multiply the color by the diffuse illumination level to get final output color.
-    gl_FragColor = specularCoefficient * u_DiffuseColour + u_DiffuseColour * diffuse + ambientColour;
+   gl_FragColor = specular * baseColour + diffuse * baseColour + ambientColour;
 }

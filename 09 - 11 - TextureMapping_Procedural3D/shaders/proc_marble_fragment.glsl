@@ -1,3 +1,15 @@
+#define PI 3.1415926
+
+uniform vec3 u_LightPos;
+uniform vec4 u_DiffuseColour;
+uniform vec3 u_EyePosition;
+uniform float u_Shininess;
+
+varying vec3 v_Normal;
+varying vec2 v_TexCoord2D;
+varying vec3 v_TexCoord3D;
+varying vec3 v_Position;
+
 vec4 permute(vec4 x){return mod(((x*34.0)+1.0)*x, 289.0);}
 vec4 taylorInvSqrt(vec4 r){return 1.79284291400159 - 0.85373472095314 * r;}
 vec4 fade(vec4 t) {return t*t*t*(t*(t*6.0-15.0)+10.0);}
@@ -214,5 +226,85 @@ float snoise(vec4 v_old, float scale) {
                                 dot(p2,x2), dot(p3,x3) ) );
 }
 
+vec4 basicPerlin(float scale) {
+   float n = pnoise(vec4(v_TexCoord3D, 1.0), scale);
+
+   vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+   return white * vec4(0.5 + 0.5 * vec3(n, n, n), 1.0);
+}
+
+float rand(vec2 c) {
+   return fract(sin(dot(c.xy, vec2(12.9898,78.233))) * 43758.5453);
+}
+
+float noise(vec2 p, float freq) {
+   float screenWidth = 100;
+
+   float unit = screenWidth / freq;
+   vec2 ij = floor(p / unit);
+   vec2 xy = mod(p, unit) / unit;
+   xy = 0.5 * (1.0 - cos(PI * xy));
+   float a = rand(ij + vec2(0.0, 0.0));
+   float b = rand(ij + vec2(1.0, 0.0));
+   float c = rand(ij + vec2(0.0, 1.0));
+   float d = rand(ij + vec2(1.0, 1.0));
+   float x1 = mix(a, b, xy.x);
+   float x2 = mix(c, d, xy.x);
+   return mix(x1, x2, xy.y);
+}
+
+vec4 marble(float scale) {
+   vec2 coords = v_TexCoord2D;
+
+   int mapHeight = 100;
+   int mapWidht = 100;
+   int octaves = 4;
+   float persistence = 0.75;
+   float lacularity = 2.5;
+
+   float amplitude = 1.0;
+   float frequency = 1.0;
+   float n = 0.0;
+
+   for (int i = 0; i < octaves; i++) {
+      float sampleX = coords.x / scale * frequency;
+      float sampleY = coords.y / scale * frequency;
+
+      n += noise(vec2(sampleX, sampleY), 1000.0);
+
+      amplitude *= persistence;
+      frequency *= lacularity;
+   }
+
+   vec4 white = vec4(1.0, 1.0, 1.0, 1.0);
+   return white * vec4(0.5 + 0.5 * vec3(n, n, n), 1.0);
+}
+
 void main() {
+   // procedurally-generated texture
+   float scale = 25.0;
+   //vec4 baseColour = basicPerlin(scale);
+   vec4 baseColour = marble(scale);
+
+   // lighting and shading
+   vec3 normal = normalize(v_Normal);
+
+   // ambient
+   vec4 ambientColour = vec4(0.1, 0.1, 0.1, 1.0);
+
+   // diffuse
+   float distance = length(u_LightPos - v_Position);
+   vec3 lightVector = normalize(u_LightPos - v_Position);
+   float diffuse = clamp(dot(normal, lightVector), 0, 1);
+   diffuse = diffuse * (1.0 / (1.0 + (0.00025 * distance * distance)));
+
+   // specular
+   vec3 incidence = -lightVector;
+   vec3 reflection = reflect(incidence, normal);
+   vec3 eyeVector = normalize(u_EyePosition - v_Position);
+   float cosAngle = max(0.0, dot(eyeVector, reflection));
+   float specular = pow(cosAngle, u_Shininess);
+
+   //gl_FragColor = baseColour;
+   gl_FragColor = specular * baseColour + diffuse * baseColour + ambientColour;
 }

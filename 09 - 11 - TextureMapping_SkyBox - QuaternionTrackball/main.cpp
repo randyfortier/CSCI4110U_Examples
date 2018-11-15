@@ -430,82 +430,82 @@ static void keyboard(unsigned char key, int x, int y) {
 }
 
 int main(int argc, char** argv) {
-    glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-    glutInitWindowSize(width, height);
-    glutCreateWindow("CSCI 4110U - Texture Mapping - SkyBox");
-    glutIdleFunc(&update);
-    glutDisplayFunc(&render);
-    glutReshapeFunc(&reshape);
-    glutMotionFunc(&drag);
-    glutMouseFunc(&mouse);
-    glutKeyboardFunc(&keyboard);
+   glutInit(&argc, argv);
+   glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
+   glutInitWindowSize(width, height);
+   glutCreateWindow("CSCI 4110U - Texture Mapping - SkyBox");
+   glutIdleFunc(&update);
+   glutDisplayFunc(&render);
+   glutReshapeFunc(&reshape);
+   glutMotionFunc(&drag);
+   glutMouseFunc(&mouse);
+   glutKeyboardFunc(&keyboard);
 
-    glewInit();
-    if (!GLEW_VERSION_2_0) {
-        std::cerr << "OpenGL 2.0 not available" << std::endl;
-        return 1;
-    }
-    std::cout << "Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
-		std::cout << "Using OpenGL " << glGetString(GL_VERSION) << std::endl;
+   glewInit();
+   if (!GLEW_VERSION_2_0) {
+      std::cerr << "OpenGL 2.0 not available" << std::endl;
+      return 1;
+   }
+   std::cout << "Using GLEW " << glewGetString(GLEW_VERSION) << std::endl;
+	std::cout << "Using OpenGL " << glGetString(GL_VERSION) << std::endl;
 
-    // determine the initial camera position
-    eyePosition.x = cameraRadius * sin(theta) * cos(phi);
-    eyePosition.y = cameraRadius * sin(theta) * sin(phi);
-    eyePosition.z = cameraRadius * cos(theta);
+   // determine the initial camera position
+   eyePosition.x = cameraRadius * sin(theta) * cos(phi);
+   eyePosition.y = cameraRadius * sin(theta) * sin(phi);
+   eyePosition.z = cameraRadius * cos(theta);
 
     // load the texture images
     //createTexture("textures/lagoon_rt.tga");
 
-    std::vector<std::string> filenames;
-    filenames.push_back("textures/cposx.png");
-    filenames.push_back("textures/cnegx.png");
-    filenames.push_back("textures/cposy.png");
-    filenames.push_back("textures/cnegy.png");
-    filenames.push_back("textures/cposz.png");
-    filenames.push_back("textures/cnegz.png");
-    /*
-    filenames.push_back("textures/right.jpg");
-    filenames.push_back("textures/left.jpg");
-    filenames.push_back("textures/top.jpg");
-    filenames.push_back("textures/bottom.jpg");
-    filenames.push_back("textures/front.jpg");
-    filenames.push_back("textures/back.jpg");
-    */
+   std::vector<std::string> filenames;
+   filenames.push_back("textures/cposx.png");
+   filenames.push_back("textures/cnegx.png");
+   filenames.push_back("textures/cposy.png");
+   filenames.push_back("textures/cnegy.png");
+   filenames.push_back("textures/cposz.png");
+   filenames.push_back("textures/cnegz.png");
+   /*
+   filenames.push_back("textures/right.jpg");
+   filenames.push_back("textures/left.jpg");
+   filenames.push_back("textures/top.jpg");
+   filenames.push_back("textures/bottom.jpg");
+   filenames.push_back("textures/front.jpg");
+   filenames.push_back("textures/back.jpg");
+   */
 
-    skyboxTexture = createCubemap(filenames);
-    glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
+   skyboxTexture = createCubemap(filenames);
+   glEnable(GL_TEXTURE_CUBE_MAP_SEAMLESS);
 
-    // create the scene geometry
-    createSkybox();
-    createGeometry();
+   // create the scene geometry
+   createSkybox();
+   createGeometry();
 
-    // test out quaternions
-    glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);
-    float sqrtHalf = sqrt(0.5f);
-    glm::quat rotx(sqrtHalf, sqrtHalf, 0.0f, 0.0f);  // 90 degrees about x
-    glm::quat rotz(sqrtHalf, 0.0f, 0.0f, sqrtHalf);  // 90 degrees about z
+   // test out quaternions
+   glm::quat rot(1.0f, 0.0f, 0.0f, 0.0f);
+   float sqrtHalf = sqrt(0.5f);
+   glm::quat rotx(sqrtHalf, sqrtHalf, 0.0f, 0.0f);  // 90 degrees about x
+   glm::quat rotz(sqrtHalf, 0.0f, 0.0f, sqrtHalf);  // 90 degrees about z
 
-    rot *= rotx;
-    rot *= rotz;
+   rot *= rotx;
+   rot *= rotz;
 
 
-    // load the GLSL shader programs
+   // load the GLSL shader programs
 
-    ShaderProgram program;
-    program.loadShaders("shaders/combined_vertex.glsl", "shaders/combined_fragment.glsl");
-    //program.loadShaders("shaders/reflection_vertex.glsl", "shaders/reflection_fragment.glsl");
-    //program.loadShaders("shaders/refraction_vertex.glsl", "shaders/refraction_fragment.glsl");
-    //program.loadShaders("shaders/copper_vertex.glsl", "shaders/copper_fragment.glsl");
+   ShaderProgram program;
+   program.loadShaders("shaders/combined_vertex.glsl", "shaders/combined_fragment.glsl");
+   //program.loadShaders("shaders/reflection_vertex.glsl", "shaders/reflection_fragment.glsl");
+   //program.loadShaders("shaders/refraction_vertex.glsl", "shaders/refraction_fragment.glsl");
+   //program.loadShaders("shaders/copper_vertex.glsl", "shaders/copper_fragment.glsl");
   	programId = program.getProgramId();
 
-    ShaderProgram skyboxProgram;
-    skyboxProgram.loadShaders("shaders/skybox_vertex.glsl", "shaders/skybox_fragment.glsl");
+   ShaderProgram skyboxProgram;
+   skyboxProgram.loadShaders("shaders/skybox_vertex.glsl", "shaders/skybox_fragment.glsl");
   	skyboxProgramId = skyboxProgram.getProgramId();
 
-    glutMainLoop();
+   glutMainLoop();
 
-    return 0;
+   return 0;
 }
 
 static unsigned int createCubemap(std::vector<std::string> filenames) {
