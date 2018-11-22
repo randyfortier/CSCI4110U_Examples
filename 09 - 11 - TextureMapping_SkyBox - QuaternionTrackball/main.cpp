@@ -32,9 +32,9 @@ int width = 1024;
 int height = 768;
 
 GLuint programIds[NUM_SHADERS];
-int programIndex;
+int programIndex = 1;
 int lastShaderTime = 0;
-bool animateShaders = true;
+bool animateShaders = false;
 
 GLuint skyboxProgramId;
 
@@ -50,7 +50,7 @@ GLuint skybox_vbo = 0;
 unsigned int skyboxTextures[NUM_SKYBOXES];
 unsigned int skyboxIndex;
 int lastSkyboxTime = 0;
-bool animateSkyboxes = true;
+bool animateSkyboxes = false;
 
 unsigned int numVertices;
 
