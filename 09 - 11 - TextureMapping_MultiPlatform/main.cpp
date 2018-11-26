@@ -32,11 +32,13 @@ GLuint textureCoords_vbo = 0;
 GLuint normals_vbo = 0;
 GLuint colours_vbo = 0;
 
+GLuint textureId;
+
 unsigned int numVertices;
 
 unsigned int loadTexture(char const * path);
 
-static void createTexture(std::string filename) {
+static GLuint createTexture(std::string filename) {
    int imageWidth, imageHeight;
    int numComponents;
 
@@ -66,6 +68,8 @@ static void createTexture(std::string filename) {
 
    // free up the bitmap
    stbi_image_free(bitmap);
+
+   return textureId;
 }
 
 static void createGeometry(void) {
@@ -154,10 +158,10 @@ static void render(void) {
   glUniformMatrix4fv(mvpMatrixId, 1, GL_FALSE, &mvp[0][0]);
 
   // texture sampler - a reference to the texture we've previously created
-  GLuint textureId  = glGetUniformLocation(programId, "u_TextureSampler");
+  GLuint textureSampler  = glGetUniformLocation(programId, "u_TextureSampler");
   glActiveTexture(GL_TEXTURE0);  // texture unit 0
   glBindTexture(GL_TEXTURE_2D, textureId);
-  glUniform1i(textureId, 0);
+  glUniform1i(textureSampler, 0);
 
   // find the names (ids) of each vertex attribute
   GLint positionAttribId = glGetAttribLocation(programId, "position");
@@ -237,7 +241,7 @@ int main(int argc, char** argv) {
 	std::cout << "Using OpenGL " << glGetString(GL_VERSION) << std::endl;
 
    createGeometry();
-   createTexture("textures/planks.jpg");
+   textureId = createTexture("textures/planks.jpg");
 
    ShaderProgram program;
   	program.loadShaders("shaders/vertex.glsl", "shaders/fragment.glsl");
