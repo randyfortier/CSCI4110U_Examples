@@ -1,0 +1,18 @@
+﻿  Vector3.cpp
+  Util.cpp
+  Sphere.cpp
+  Ray.cpp
+  Primitive.cpp
+  Plane.cpp
+  Material.cpp
+  main.cpp
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(23): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(24): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(27): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(28): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(31): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(32): warning C4305: 'argument': truncation from 'double' to 'float'
+d:\fall 2018\csci4110u\examples\11 - 12 - raytracing\raytracer\raytracer\main.cpp(53): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+  Colour.cpp
+  Generating Code...
+  RayTracer.vcxproj -> D:\Fall 2018\CSCI4110U\Examples\11 - 12 - RayTracing\RayTracer\Debug\RayTracer.exe
