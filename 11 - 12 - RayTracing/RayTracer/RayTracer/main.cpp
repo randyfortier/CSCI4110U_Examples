@@ -52,7 +52,65 @@ void update(void) {
 	std::chrono::duration<double> elapsedTime = frameTime - lastFrameTime;
 	float deltaT = elapsedTime.count();
 
-	// TODO
+	// animate the light source
+	lightPosition.z = originalLightZ + sinf(deltaT);
+	lightPosition.x = originalLightX + sinf(deltaT);
+
+	// clear the raster
+	for (int y = 0; y < resolutionY; y++) {
+		for (int x = 0; x < resolutionX; x++) {
+			raster[y * resolutionX + x] = COLOUR_BLACK;
+		}
+	}
+
+	float stepSizeX = 1.0f / (float)resolutionX;
+	float stepSizeY = 1.0f / (float)resolutionY;
+
+	// trace some rays!
+	for (int y = 0; y < resolutionY; y++) {
+		for (int x = 0; x < resolutionX; x++) {
+			// generate a ray
+			Vector3 pixelLocation;
+			pixelLocation.x = ((float)x + 0.5f) * stepSizeX;
+			pixelLocation.y = ((float)y + 0.5f) * stepSizeY;
+			pixelLocation.z = 0.0f;
+
+			Vector3 direction = pixelLocation - eyeLocation;
+			direction.normalize();
+
+			Ray ray(eyeLocation, direction);
+
+			float minT = ground.intersectionPoint(ray);
+			if (!std::isnan(minT)) {
+				if (minT < 0.0f) {
+					minT = NAN;
+				}
+				else {
+					Colour groundColour = ground.calculateShading(lightPosition, lightColour, ray, minT);
+					raster[y * resolutionX + x] = groundColour;
+				}
+			}
+
+			// check if it intersects with any of our spheres
+			for (unsigned int i = 0; i < scene.size(); i++) {
+				Sphere sphere = scene.at(i);
+
+				float t = sphere.intersectionPoint(ray);
+
+				if (!std::isnan(t) && t > 0.0f) {
+					if (isnan(minT) || t < minT) {
+						minT = t;
+
+						Colour sphereColour = sphere.calculateShading(lightPosition, lightColour, ray, t);
+						raster[y * resolutionX + x] = sphereColour;
+					}
+				}
+			}
+
+
+		}
+	}
+
 
 	glutPostRedisplay();
 }
